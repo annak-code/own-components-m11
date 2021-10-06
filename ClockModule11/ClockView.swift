@@ -22,6 +22,9 @@ class ClockView: UIView {
     private let hourLine = UIView()
     private let minuteLine = UIView()
     
+    private let roundedView = UIView()
+    var roundedViewColor = UIColor.red
+    
     lazy var date = Date()
     lazy var calendar = NSCalendar.current
     lazy var hours: CGFloat = CGFloat(calendar.component(.hour, from: date))
@@ -53,17 +56,21 @@ class ClockView: UIView {
         minuteLine.frame = CGRect(x: w / 2 - minuteLineSize / 2, y: markerSize.height + 10, width: minuteLineSize, height: h / 2 - markerSize.height - 10 )
         minuteLine.backgroundColor = minuteLineColor
         
+        roundedView.frame = CGRect(x: h / 2 - 10, y: w / 2 - 10, width: 20, height: 20)
+        roundedView.backgroundColor = roundedViewColor
+        roundedView.layer.cornerRadius = 10
+        
         //hours = 0
         //minutes = 0
         updateHours()
         
         for v in [topMarker, leftMarker, rightMarker, bottomMarker] {
             v.backgroundColor = markerColor
-            addSubview(v)
         }
         
-        addSubview(minuteLine)
-        addSubview(hourLine)
+        for v in [topMarker, leftMarker, rightMarker, bottomMarker, minuteLine, hourLine, roundedView] {
+            addSubview(v)
+        }
         
         //круглые часы
         layer.cornerRadius = w / 2
