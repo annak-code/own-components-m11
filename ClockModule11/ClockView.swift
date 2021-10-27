@@ -2,33 +2,40 @@
 
 import UIKit
 
+@IBDesignable
 class ClockView: UIView {
 
     var isSetuped = false
+    var timer: Timer = Timer()
     
-    var markerSize: CGSize = CGSize(width: 4, height: 12)
-    var markerColor = UIColor.blue
+    @IBInspectable var markerSize: CGSize = CGSize(width: 4, height: 12)
+    @IBInspectable var markerColor = UIColor.blue
     
     private let topMarker = UIView()
     private let leftMarker = UIView()
     private let rightMarker = UIView()
     private let bottomMarker = UIView()
     
-    var hourLineSize: CGFloat = 12
-    var hourLineColor = UIColor.red
-    var minuteLineSize: CGFloat = 6
-    var minuteLineColor = UIColor.green
+    @IBInspectable var hourLineSize: CGFloat = 12
+    @IBInspectable var hourLineColor = UIColor.red
+    @IBInspectable var minuteLineSize: CGFloat = 6
+    @IBInspectable var minuteLineColor = UIColor.green
+    @IBInspectable var secondLineSize: CGFloat = 2
+    @IBInspectable var secondLineColor = UIColor.blue
+    
     
     private let hourLine = UIView()
     private let minuteLine = UIView()
+    private let secondLine = UIView()
     
     private let roundedView = UIView()
-    var roundedViewColor = UIColor.red
+    @IBInspectable var roundedViewColor = UIColor.red
     
     lazy var date = Date()
     lazy var calendar = NSCalendar.current
-    lazy var hours: CGFloat = CGFloat(calendar.component(.hour, from: date))
-    lazy var minutes: CGFloat = CGFloat(calendar.component(.minute, from: date))
+    @IBInspectable lazy var hours: CGFloat = CGFloat()
+    @IBInspectable lazy var minutes: CGFloat = CGFloat()
+    @IBInspectable lazy var seconds: CGFloat = CGFloat()
     
     
     override func layoutSubviews() {
@@ -53,8 +60,12 @@ class ClockView: UIView {
         hourLine.backgroundColor = hourLineColor
         
         minuteLine.layer.anchorPoint = CGPoint(x: 0.5, y: 1)
-        minuteLine.frame = CGRect(x: w / 2 - minuteLineSize / 2, y: markerSize.height + 10, width: minuteLineSize, height: h / 2 - markerSize.height - 10 )
+        minuteLine.frame = CGRect(x: w / 2 - minuteLineSize / 2, y: markerSize.height + 20, width: minuteLineSize, height: h / 2 - markerSize.height - 20 )
         minuteLine.backgroundColor = minuteLineColor
+        
+        secondLine.layer.anchorPoint = CGPoint(x: 0.5, y: 1)
+        secondLine.frame = CGRect(x: w / 2 - secondLineSize / 2, y: markerSize.height, width: secondLineSize, height: h / 2 - markerSize.height)
+        secondLine.backgroundColor = secondLineColor
         
         roundedView.frame = CGRect(x: h / 2 - 10, y: w / 2 - 10, width: 20, height: 20)
         roundedView.backgroundColor = roundedViewColor
@@ -62,13 +73,16 @@ class ClockView: UIView {
         
         //hours = 0
         //minutes = 0
+        timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(ClockView.updateHours), userInfo: nil, repeats: true)
+        
+        
         updateHours()
         
         for v in [topMarker, leftMarker, rightMarker, bottomMarker] {
             v.backgroundColor = markerColor
         }
         
-        for v in [topMarker, leftMarker, rightMarker, bottomMarker, minuteLine, hourLine, roundedView] {
+        for v in [topMarker, leftMarker, rightMarker, bottomMarker, hourLine, minuteLine, secondLine, roundedView] {
             addSubview(v)
         }
         
@@ -77,7 +91,16 @@ class ClockView: UIView {
         
     }
     
-    func updateHours() {
+    @objc func updateHours() {
+        
+        date = Date()
+        
+        hours = CGFloat(calendar.component(.hour, from: date))
+        minutes = CGFloat(calendar.component(.minute, from: date))
+        seconds = CGFloat(calendar.component(.second, from: date))
+        
+        let secondAngle = 2 * CGFloat.pi / 60 * seconds
+        secondLine.transform = CGAffineTransform(rotationAngle: secondAngle)
         
         let minuteAngle = 2 * CGFloat.pi / 60 * minutes
         minuteLine.transform = CGAffineTransform(rotationAngle: minuteAngle)
@@ -86,7 +109,11 @@ class ClockView: UIView {
         hourLine.transform = CGAffineTransform(rotationAngle: hourAngle)
         
         print(minuteAngle)
+        print(hours)
         print(minutes)
+        print(seconds)
+        
+        
     }
 
 }
